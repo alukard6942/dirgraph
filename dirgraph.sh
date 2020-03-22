@@ -37,7 +37,7 @@ MainLoop() {
 			#echo "d: $file"
 			MainLoop "$1/$file"
 		else
-			updateCount `du -sb "$1/$file"`
+			updateCount `du -s -B 1 "$1/$file"`
 			FileCount=`expr $FileCount + 1`
 
 		fi 
