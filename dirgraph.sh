@@ -3,28 +3,45 @@
 DirCount=0
 FileCount=0
 
-declare -a ArrayCount
+ArrayCount[0]=0
+ArrayCount[1]=0
+ArrayCount[2]=0
+ArrayCount[3]=0
+ArrayCount[4]=0
+ArrayCount[5]=0
+ArrayCount[6]=0
+ArrayCount[7]=0
+ArrayCount[8]=0
 
 updateCount() {
 	#echo $1 , $2
 	if   [[ $1 -le 100 ]] 		; then 	#0 100 B
-		Array[0]=`expr ${Array[0]} + 1`
+		ArrayCount[0]=`expr ${ArrayCount[0]} + 1`
+		echo $1
 	elif [[ $1 -le 1024 ]] 		; then 	#1 1KiB
-		Array[1]=`expr ${Array[1]} + 1`
+		ArrayCount[1]=`expr ${ArrayCount[1]} + 1`
+		echo $1
 	elif [[ $1 -le 10240 ]]		; then 	#2 10KiB
-		Array[2]=`expr ${Array[2]} + 1`
+		ArrayCount[2]=`expr ${ArrayCount[2]} + 1`
+		echo $1
 	elif [[ $1 -le 102400 ]]	; then 	#3 100KiB
-		Array[3]=`expr ${Array[3]} + 1`
+		ArrayCount[3]=`expr ${ArrayCount[3]} + 1`
+		echo $1
 	elif [[ $1 -le 1048576 ]]	; then 	#4 1MiB
-		Array[4]=`expr ${Array[4]} + 1`
+		ArrayCount[4]=`expr ${ArrayCount[4]} + 1`
+		echo $1
 	elif [[ $1 -le 10485760 ]]	; then 	#5 10MiB
-		Array[5]=`expr ${Array[5]} + 1`
+		ArrayCount[5]=`expr ${ArrayCount[5]} + 1`
+		echo $1
 	elif [[ $1 -le 104857600 ]]	; then 	#6 100MiB
-		Array[6]=`expr ${Array[6]} + 1`
+		ArrayCount[6]=`expr ${ArrayCount[6]} + 1`
+		echo $1
 	elif [[ $1 -le 1073741824 ]]; then 	#7 1GiB
-		Array[7]=`expr ${Array[7]} + 1`
+		ArrayCount[7]=`expr ${ArrayCount[7]} + 1`
+		echo $1
 	else 								#8 >1GiB
-		Array[8]=`expr ${Array[8]} + 1`
+		ArrayCount[8]=`expr ${ArrayCount[8]} + 1`
+		echo $1
 	fi
 }
 
@@ -37,7 +54,7 @@ MainLoop() {
 			#echo "d: $file"
 			MainLoop "$1/$file"
 		else
-			updateCount `du -s -B 1 "$1/$file"`
+			updateCount `du -B 1 "$1/$file"`
 			FileCount=`expr $FileCount + 1`
 
 		fi 
@@ -61,7 +78,12 @@ echo "Directories: $DirCount"
 echo "All files: $FileCount"
 echo "File size histogram:"
 
-echo "<100B" ${ArrayCount[0]}
-echo "<100B" ${ArrayCount[1]}
-echo "<100B" ${ArrayCount[2]}
-echo "<100B" ${ArrayCount[3]}
+echo "  <100 B  :" ${ArrayCount[0]}
+echo "  <1 KiB  :" ${ArrayCount[1]}
+echo "  <10 KiB :" ${ArrayCount[2]}
+echo "  <100 KiB:" ${ArrayCount[3]}
+echo "  <1 MiB  :" ${ArrayCount[4]}
+echo "  <10 MiB :" ${ArrayCount[5]}
+echo "  <100 MiB:" ${ArrayCount[6]}
+echo "  <1 GiB  :" ${ArrayCount[7]}
+echo "  >=1 GiB :" ${ArrayCount[8]}
