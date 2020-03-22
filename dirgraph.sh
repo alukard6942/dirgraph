@@ -1,6 +1,4 @@
-#!/bin/ksh
-#!/bin/bash
-
+#!/usr/bin/env bash
 
 DirCount=0
 FileCount=0
