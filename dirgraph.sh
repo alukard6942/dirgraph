@@ -20,8 +20,12 @@ MaxLine=0
 ##			counting each category			##
 ##############################################
 
-for i in {1..8}; do 
-	CountArray[$i]=0
+# for i in {1..8}; do 
+# 	Arr[$i]=0
+# done
+
+for i in 0 1 2 3 4 5 6 7 8 ; do
+	eval Arr$i=0
 done
 
 
@@ -32,31 +36,30 @@ done
 
 updateCount() {
 	#echo $1 , $2
-	if   [[ $1 -le 100 ]] 		; then 	#0 100 B
-		CountArray[0]=`expr ${CountArray[0]} + 1`
-	elif [[ $1 -le 1024 ]] 		; then 	#1 1KiB
-		CountArray[1]=`expr ${CountArray[1]} + 1`
-	elif [[ $1 -le 10240 ]]		; then 	#2 10KiB
-		CountArray[2]=`expr ${CountArray[2]} + 1`
-	elif [[ $1 -le 102400 ]]	; then 	#3 100KiB
-		CountArray[3]=`expr ${CountArray[3]} + 1`
-	elif [[ $1 -le 1048576 ]]	; then 	#4 1MiB
-		CountArray[4]=`expr ${CountArray[4]} + 1`
-	elif [[ $1 -le 10485760 ]]	; then 	#5 10MiB
-		CountArray[5]=`expr ${CountArray[5]} + 1`
-	elif [[ $1 -le 104857600 ]]	; then 	#6 100MiB
-		CountArray[6]=`expr ${CountArray[6]} + 1`
-	elif [[ $1 -le 1073741824 ]]; then 	#7 1GiB
-		CountArray[7]=`expr ${CountArray[7]} + 1`
+	if   [ $1 -le 100 ] 		; then 	#0 100 B
+		Arr0=`expr $Arr0 + 1`
+	elif [ $1 -le 1024 ] 		; then 	#1 1KiB
+		Arr1=`expr $Arr1 + 1`
+	elif [ $1 -le 10240 ]		; then 	#2 10KiB
+		Arr2=`expr $Arr2 + 1`
+	elif [ $1 -le 102400 ]		; then 	#3 100KiB
+		Arr3=`expr $Arr3 + 1`
+	elif [ $1 -le 1048576 ]		; then 	#4 1MiB
+		Arr4=`expr $Arr4 + 1`
+	elif [ $1 -le 10485760 ]	; then 	#5 10MiB
+		Arr5=`expr $Arr5 + 1`
+	elif [ $1 -le 104857600 ]	; then 	#6 100MiB
+		Arr6=`expr $Arr6 + 1`
+	elif [ $1 -le 1073741824 ]	; then 	#7 1GiB
+		Arr7=`expr $Arr7 + 1`
 	else 								#8 >1GiB
-		CountArray[8]=`expr ${CountArray[8]} + 1`
+		Arr8=`expr $Arr8 + 1`
 	fi
 }
 
 
 MainLoop() {
-	#echo "$1"
-	for file in `ls "$1"`; do  		#### TODO --quoting-style=[something]
+	for file in $(ls -A  -b --ignore="$ignoredFiles" "$1"); do  		#### TODO --quoting-style=[something]
 		if [ -d "$1/$file" ]; then
 			DirCount=`expr $DirCount + 1`
 			MainLoop "$1/$file"
@@ -69,23 +72,27 @@ MainLoop() {
 
 drawLine() {
 	count=$1
-	Col=`expr $(tput cols) - 13`
-	if [[ nFlag ]]; then
+	if [ -t 1 ]; then
+		Col=`expr $(tput cols) - 1`
+	fi
+	Col=`expr $Col - 12`
+
+	if $nFlag; then
 		count=`expr $count \* $Col`
 		count=`expr $count / $MaxLine`
-	elif [[ count -gt $Col ]]; then
+	elif [ $count -gt $Col ]; then
 		count=$Col
 	fi 
 
-	while [[ $count -gt 0 ]]; do
+	while [ $count -gt 0 ]; do
 		echo -n "#"
 		count=`expr $count - 1`
 	done
 }
 
 getMaxLine() {
-	for tmp in ${CountArray[@]}; do
-		if [[ $tmp -gt $MaxLine ]]; then
+	for tmp in $Arr0 $Arr1 $Arr2 $Arr3 $Arr4 $Arr5 $Arr6 $Arr7 $Arr8; do
+		if [ $tmp -gt $MaxLine ]; then
 			MaxLine=$tmp
 		fi
 	done
@@ -98,20 +105,23 @@ getMaxLine() {
 
 while getopts ":ni:" opt; do
   case ${opt} in
-    n ) nFlag=true
-		shift
+    n ) nFlag=true	
 		;;
-    i ) echo i ;shift
+    i ) ignoredFiles=$OPTARG
 		;;
     \?) echo "Usage: $0 [-n] [directory]"; exit 1
     	;;
   esac
 done
+shift $((OPTIND -1))
 
 
-
-if [[ "$1" != "" ]]; then
-	rootDir=$1
+if [ "$1" != ""  ]; then
+	if [ -d "$1" ]; then
+		rootDir=$1
+	else 
+		exit 1
+	fi
 fi
 
 
@@ -119,29 +129,24 @@ fi
 ## 					Main 					##
 ##############################################
 
-MainLoop $rootDir
+MainLoop "$rootDir"
 
-if [[ "a " =~ ^[]$ ]] 
-	then
-  	echo hello
-fi
 
-echo "Root directory:" 		$rootDir
-echo "Directories:"			$DirCount
-echo "All files:" 			$FileCount
+echo "Root directory:" 		"$rootDir"
+echo "Directories:"			"$DirCount"
+echo "All files:" 			"$FileCount"
 echo "File size histogram:"
 
-if [[ $nFlag ]]; then
-	MaxLine= getMaxLine
+if $nFlag ; then
+	getMaxLine
 fi
 
-
-echo "  <100 B  :" $(drawLine ${CountArray[0]})
-echo "  <1 KiB  :" $(drawLine ${CountArray[1]})
-echo "  <10 KiB :" $(drawLine ${CountArray[2]})
-echo "  <100 KiB:" $(drawLine ${CountArray[3]})
-echo "  <1 MiB  :" $(drawLine ${CountArray[4]})
-echo "  <10 MiB :" $(drawLine ${CountArray[5]})
-echo "  <100 MiB:" $(drawLine ${CountArray[6]})
-echo "  <1 GiB  :" $(drawLine ${CountArray[7]})
-echo "  >=1 GiB :" $(drawLine ${CountArray[8]})
+echo -n "  <100 B  :"; drawLine "$Arr0" ; echo
+echo -n "  <1 KiB  :"; drawLine "$Arr1" ; echo
+echo -n "  <10 KiB :"; drawLine "$Arr2" ; echo
+echo -n "  <100 KiB:"; drawLine "$Arr3" ; echo
+echo -n "  <1 MiB  :"; drawLine "$Arr4" ; echo
+echo -n "  <10 MiB :"; drawLine "$Arr5" ; echo
+echo -n "  <100 MiB:"; drawLine "$Arr6" ; echo
+echo -n "  <1 GiB  :"; drawLine "$Arr7" ; echo
+echo -n "  >=1 GiB :"; drawLine "$Arr8" ; echo
