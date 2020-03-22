@@ -59,7 +59,7 @@ updateCount() {
 
 
 MainLoop() {
-	for file in $(ls -A  -b --ignore="$ignoredFiles" "$1"); do  		#### TODO --quoting-style=[something]
+	for file in $(ls -A  --ignore="$ignoredFiles" "$1"); do  		#### TODO --quoting-style=[something]
 		if [ -d "$1/$file" ]; then
 			DirCount=`expr $DirCount + 1`
 			MainLoop "$1/$file"
