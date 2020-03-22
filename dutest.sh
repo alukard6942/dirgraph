@@ -33,3 +33,8 @@ echo ----------- arr loop ------------------
 for tmp in ${Array[@]}; do
 	echo $tmp
 done
+
+regex=$1
+
+if $(echo addd | grep -qxe $regex ); then
+ echo fi; fi

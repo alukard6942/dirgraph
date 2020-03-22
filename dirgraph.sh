@@ -9,7 +9,7 @@ POSIXLY_CORRECT=yes
 DirCount=0
 FileCount=0
 rootDir="$PWD"
-ignoredFiles=""
+ignoredFiles="\$a"
 nFlag=false
 Col=79
 MaxLine=0
@@ -59,14 +59,19 @@ updateCount() {
 
 
 MainLoop() {
-	for file in $(ls -A  --ignore="$ignoredFiles" "$1"); do  		#### TODO --quoting-style=[something]
-		if [ -d "$1/$file" ]; then
-			DirCount=`expr $DirCount + 1`
-			MainLoop "$1/$file"
-		else
-			updateCount `du -B 1 "$1/$file"`
-			FileCount=`expr $FileCount + 1`
-		fi 
+	for file in "$1"/* ; do 
+		if ! $(echo `basename "${file}"` | grep -qxe $ignoredFiles ) ; then
+			#echo `basename "${file}"` -qxe "$ignoredFiles"
+			if [ -d "$file" ]; then
+				DirCount=`expr $DirCount + 1`
+				MainLoop "$file"
+			# elif [ -d "$file" ]; then
+			# 	DirCount=`expr $DirCount + 1`
+			elif [ -f $file ]; then
+				updateCount `du -B 1 "$file"`
+				FileCount=`expr $FileCount + 1`
+			fi 
+		fi
 	done
 }
 
@@ -77,7 +82,7 @@ drawLine() {
 	fi
 	Col=`expr $Col - 12`
 
-	if $nFlag; then
+	if $nFlag && [ $count -gt 0 ]; then
 		count=`expr $count \* $Col`
 		count=`expr $count / $MaxLine`
 	elif [ $count -gt $Col ]; then
@@ -98,6 +103,11 @@ getMaxLine() {
 	done
 }
 
+Usage() {
+	echo "Usage:" 
+	echo "    $0 [-n] [-i REGEX] [FILE]"
+}
+
 ##############################################
 ## 				Get opt 					##
 ##############################################
@@ -109,7 +119,7 @@ while getopts ":ni:" opt; do
 		;;
     i ) ignoredFiles=$OPTARG
 		;;
-    \?) echo "Usage: $0 [-n] [directory]"; exit 1
+    \?) Usage
     	;;
   esac
 done
@@ -120,6 +130,7 @@ if [ "$1" != ""  ]; then
 	if [ -d "$1" ]; then
 		rootDir=$1
 	else 
+		Usage 
 		exit 1
 	fi
 fi
