@@ -20,9 +20,15 @@ MaxLine=0
 ##			counting each category			##
 ##############################################
 
-for i in {1..8}; do 
-	CountArray[$i]=0
-done
+count100=0
+count1k=0
+count10k=0
+count100k=0
+count1M=0
+count10M=0
+count100M=0
+count1G=0
+countBiger=0
 
 
 ##############################################
@@ -31,25 +37,25 @@ done
 
 
 updateCount() {
-	#echo $1 , $2
-	if   [[ $1 -le 100 ]] 		; then 	#0 100 B
-		CountArray[0]=`expr ${CountArray[0]} + 1`
-	elif [[ $1 -le 1024 ]] 		; then 	#1 1KiB
-		CountArray[1]=`expr ${CountArray[1]} + 1`
-	elif [[ $1 -le 10240 ]]		; then 	#2 10KiB
-		CountArray[2]=`expr ${CountArray[2]} + 1`
-	elif [[ $1 -le 102400 ]]	; then 	#3 100KiB
-		CountArray[3]=`expr ${CountArray[3]} + 1`
-	elif [[ $1 -le 1048576 ]]	; then 	#4 1MiB
-		CountArray[4]=`expr ${CountArray[4]} + 1`
-	elif [[ $1 -le 10485760 ]]	; then 	#5 10MiB
-		CountArray[5]=`expr ${CountArray[5]} + 1`
-	elif [[ $1 -le 104857600 ]]	; then 	#6 100MiB
-		CountArray[6]=`expr ${CountArray[6]} + 1`
-	elif [[ $1 -le 1073741824 ]]; then 	#7 1GiB
-		CountArray[7]=`expr ${CountArray[7]} + 1`
+	echo $1 , $2
+	if   [ $1 -le 100 ] 		; then 	#0 100 B
+		count100=`expr count100 + 1`
+	elif [ $1 -le 1024 ] 		; then 	#1 1KiB
+		count1k=`expr count1k + 1`
+	elif [ $1 -le 10240 ]		; then 	#2 10KiB
+		count10k=`expr count10k + 1`
+	elif [ $1 -le 102400 ]	; then 	#3 100KiB
+		count100k=`expr count100k + 1`
+	elif [ $1 -le 1048576 ]	; then 	#4 1MiB
+		count1M=`expr count1M + 1`
+	elif [ $1 -le 10485760 ]	; then 	#5 10MiB
+		count10M=`expr count10M + 1`
+	elif [ $1 -le 104857600 ]	; then 	#6 100MiB
+		count100M=`expr count100M + 1`
+	elif [ $1 -le 1073741824 ]; then 	#7 1GiB
+		count1G=`expr count1G + 1`
 	else 								#8 >1GiB
-		CountArray[8]=`expr ${CountArray[8]} + 1`
+		countBiger=`expr countBiger + 1`
 	fi
 }
 
@@ -70,10 +76,13 @@ MainLoop() {
 drawLine() {
 	count=$1
 	Col=`expr $(tput cols) - 13`
-	if [[ nFlag ]]; then
+
+	echo $1 $count $Col $ $MaxLine
+
+	if [ nFlag ]; then
 		count=`expr $count \* $Col`
 		count=`expr $count / $MaxLine`
-	elif [[ count -gt $Col ]]; then
+	elif [ count -gt $Col ]; then
 		count=$Col
 	fi 
 
@@ -84,7 +93,8 @@ drawLine() {
 }
 
 getMaxLine() {
-	for tmp in ${CountArray[@]}; do
+	for tmp in $@ ; do
+		echo $tmp
 		if [[ $tmp -gt $MaxLine ]]; then
 			MaxLine=$tmp
 		fi
@@ -110,7 +120,7 @@ done
 
 
 
-if [[ "$1" != "" ]]; then
+if [ "$1" != "" ]; then
 	rootDir=$1
 fi
 
@@ -121,27 +131,36 @@ fi
 
 MainLoop $rootDir
 
-if [[ "a " =~ ^[]$ ]] 
-	then
-  	echo hello
-fi
 
 echo "Root directory:" 		$rootDir
 echo "Directories:"			$DirCount
 echo "All files:" 			$FileCount
 echo "File size histogram:"
+	
+	echo dbg -----------------
+echo "  <100 B  :" $count100
+echo "  <1 KiB  :" $count1k
+echo "  <10 KiB :" $count10k
+echo "  <100 KiB:" $count100k
+echo "  <1 MiB  :" $count1M
+echo "  <10 MiB :" $count10M
+echo "  <100 MiB:" $count100M
+echo "  <1 GiB  :" $count1G
+echo "  >=1 GiB :" $countBiger
+	echo dbg---------------------
 
-if [[ $nFlag ]]; then
-	MaxLine= getMaxLine
+
+if [ nFlag ]; then
+	getMaxLine $count100 $count1k $count10k $count100k $count1M $count10M $count100M $count1G $countBiger 
 fi
 
 
-echo "  <100 B  :" $(drawLine ${CountArray[0]})
-echo "  <1 KiB  :" $(drawLine ${CountArray[1]})
-echo "  <10 KiB :" $(drawLine ${CountArray[2]})
-echo "  <100 KiB:" $(drawLine ${CountArray[3]})
-echo "  <1 MiB  :" $(drawLine ${CountArray[4]})
-echo "  <10 MiB :" $(drawLine ${CountArray[5]})
-echo "  <100 MiB:" $(drawLine ${CountArray[6]})
-echo "  <1 GiB  :" $(drawLine ${CountArray[7]})
-echo "  >=1 GiB :" $(drawLine ${CountArray[8]})
+echo "  <100 B  :" $(drawLine count100)
+echo "  <1 KiB  :" $(drawLine count1k)
+echo "  <10 KiB :" $(drawLine count10k)
+echo "  <100 KiB:" $(drawLine count100k)
+echo "  <1 MiB  :" $(drawLine count1M)
+echo "  <10 MiB :" $(drawLine count10M)
+echo "  <100 MiB:" $(drawLine count100M)
+echo "  <1 GiB  :" $(drawLine count1G)
+echo "  >=1 GiB :" $(drawLine countBiger)
