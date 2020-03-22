@@ -1,5 +1,6 @@
-#!/bin/bash
 #!/bin/ksh
+#!/bin/bash
+
 
 DirCount=0
 FileCount=0
