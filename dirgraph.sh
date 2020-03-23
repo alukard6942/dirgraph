@@ -77,11 +77,6 @@ MainLoop() {
 
 drawLine() {
 	count=$1
-	if [ -t 1 ]; then
-		Col=`expr $(tput cols) - 1`
-	fi
-	Col=`expr $Col - 12`
-
 	if $nFlag && [ $count -gt 0 ]; then
 		count=`expr $count \* $Col`
 		count=`expr $count / $MaxLine`
@@ -142,15 +137,27 @@ fi
 
 MainLoop "$rootDir"
 
+if [ -t 1 ]; then
+	Col=`expr $(tput cols) - 1`
+fi
+Col=`expr $Col - 12`
+
+if $nFlag ; then
+	getMaxLine
+	if [ $MaxLine -le $Col ]; then
+		nFlag = false
+	fi
+fi
+
+
+##############################################
+##				Printing					##
+##############################################
 
 echo "Root directory:" 		"$rootDir"
 echo "Directories:"			"$DirCount"
 echo "All files:" 			"$FileCount"
 echo "File size histogram:"
-
-if $nFlag ; then
-	getMaxLine
-fi
 
 echo -n "  <100 B  :"; drawLine "$Arr0" ; echo
 echo -n "  <1 KiB  :"; drawLine "$Arr1" ; echo
