@@ -79,6 +79,9 @@ MainLoop() {
 
 drawLine() {
 	count=$1
+
+	$debug && echo -n "$1"
+	
 	if $nFlag && [ $count -gt 0 ]; then
 		count=`expr $count \* $Col`
 		count=`expr $count / $MaxLine`
@@ -146,6 +149,7 @@ if [ -t 1 ]; then
 	Col=`expr $(tput cols) - 1`
 fi
 Col=`expr $Col - 12`
+$debug && Col=`expr $Col - 3`
 
 if $nFlag ; then
 	getMaxLine
@@ -153,6 +157,8 @@ if $nFlag ; then
 		nFlag=false
 	fi
 fi
+
+
 
 
 ##############################################
