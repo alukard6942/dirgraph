@@ -164,6 +164,8 @@ $debug && echo "nFlag:           $nFlag"
 $debug && echo "Col:             $Col"
 $debug && echo "MaxLine:         $MaxLine"
 $debug && echo "debug:           $debug"
+$debug && echo "grepFlag:        $grepFlag"
+$debug && echo "duFlag:          $duFlag"
 $debug && echo "POSIXLY_CORRECT: $POSIXLY_CORRECT"
 
 
