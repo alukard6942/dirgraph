@@ -15,7 +15,7 @@ Col=79
 MaxLine=0
 debug=false
 
-grepFlag="-qxe"
+grepFlag="-qE"
 duFlag="-b"
 
 
