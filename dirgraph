@@ -13,11 +13,15 @@ ignoredFiles="\$a"
 nFlag=false
 Col=79
 MaxLine=0
+debug=false
+
+grepFlag="-qxe"
+duFlag="-b"
 
 
 
 ##############################################
-##			counting each category			##
+##					Array					##
 ##############################################
 
 # for i in {1..8}; do 
@@ -60,15 +64,13 @@ updateCount() {
 
 MainLoop() {
 	for file in "$1"/* ; do 
-		if ! $(echo `basename "${file}"` | grep -qxe $ignoredFiles ) ; then
-			#echo `basename "${file}"` -qxe "$ignoredFiles"
+		if ! $(echo "`basename "${file}"`" | grep "$grepFlag" "$ignoredFiles" ) ; then
+			$debug && echo -en "$file\r"
 			if [ -d "$file" ]; then
 				DirCount=`expr $DirCount + 1`
 				MainLoop "$file"
-			# elif [ -d "$file" ]; then
-			# 	DirCount=`expr $DirCount + 1`
-			elif [ -f $file ]; then
-				updateCount `du -B 1 "$file"`
+			elif [ -f "$file" ]; then
+				updateCount `du "$duFlag" "$file" || echo "0"`
 				FileCount=`expr $FileCount + 1`
 			fi 
 		fi
@@ -108,13 +110,16 @@ Usage() {
 ##############################################
 
 
-while getopts ":ni:" opt; do
+while getopts ":dni:" opt; do
   case ${opt} in
-    n ) nFlag=true	
+  	n ) nFlag=true	
 		;;
-    i ) ignoredFiles=$OPTARG
+	i ) ignoredFiles=$OPTARG
+		;;
+	d ) debug=true
 		;;
     \?) Usage
+		exit;
     	;;
   esac
 done
@@ -123,7 +128,7 @@ shift $((OPTIND -1))
 
 if [ "$1" != ""  ]; then
 	if [ -d "$1" ]; then
-		rootDir=$1
+		rootDir="$1"
 	else 
 		Usage 
 		exit 1
@@ -145,7 +150,7 @@ Col=`expr $Col - 12`
 if $nFlag ; then
 	getMaxLine
 	if [ $MaxLine -le $Col ]; then
-		nFlag = false
+		nFlag=false
 	fi
 fi
 
@@ -153,6 +158,15 @@ fi
 ##############################################
 ##				Printing					##
 ##############################################
+
+$debug && echo "ignoredFiles:    $ignoredFiles "
+$debug && echo "nFlag:           $nFlag"
+$debug && echo "Col:             $Col"
+$debug && echo "MaxLine:         $MaxLine"
+$debug && echo "debug:           $debug"
+$debug && echo "POSIXLY_CORRECT: $POSIXLY_CORRECT"
+
+
 
 echo "Root directory:" 		"$rootDir"
 echo "Directories:"			"$DirCount"
