@@ -66,7 +66,7 @@ updateCount() {
 MainLoop() {
 	for file in "$1"/* ; do 
 		if ! $iFlag || ! $(echo "`basename "${file}"`" | grep "$grepFlag" "$ignoredFiles" ) ; then
-			$debug && echo -en "$file\r"
+			# $debug && echo -en "$file\r"
 			if ! [ -L "$file" ] && [ -d "$file" ]; then
 				DirCount=`expr $DirCount + 1`
 				MainLoop "$file"
@@ -81,7 +81,7 @@ MainLoop() {
 drawLine() {
 	count=$1
 
-	$debug && echo -n "$1"
+	# $debug && echo -n "$1"
 	
 	if $nFlag && [ $count -gt 0 ]; then
 		count=`expr $count \* $Col`
@@ -113,22 +113,22 @@ Usage() {
 ## 				Get opt 					##
 ##############################################
 
-while getopts ":dni:" opt; do
+while getopts ":ni:" opt; do
   case ${opt} in
   	n ) nFlag=true	
 		;;
 	i ) iFlag=true
 		ignoredFiles=$OPTARG
 		;;
-	d ) debug=true
-		;;
+	# d ) debug=true
+	# 	;;
     \?) Usage
 		exit;
     	;;
   esac
 done
 
-$debug && echo "pre $0 $1 $2 $3 $4 $5 $6"
+# $debug && echo "pre $0 $1 $2 $3 $4 $5 $6"
 shift $((OPTIND -1))
 
 
@@ -152,7 +152,7 @@ if [ -t 1 ]; then
 	Col=`expr $(tput cols) - 1`
 fi
 Col=`expr $Col - 12`
-$debug && Col=`expr $Col - 3`
+# $debug && Col=`expr $Col - 3`
 
 if $nFlag ; then
 	getMaxLine
@@ -169,16 +169,16 @@ fi
 ##############################################
 
 
-$debug && echo "post $0 $1 $2 $3 $4 $5 $6"
-$debug && echo "ignoredFiles:    $ignoredFiles "
-$debug && echo "nFlag:           $nFlag"
-$debug && echo "iFlag:           $iFlag"
-$debug && echo "Col:             $Col"
-$debug && echo "MaxLine:         $MaxLine"
+# $debug && echo "post $0 $1 $2 $3 $4 $5 $6"
+# $debug && echo "ignoredFiles:    $ignoredFiles "
+# $debug && echo "nFlag:           $nFlag"
+# $debug && echo "iFlag:           $iFlag"
+# $debug && echo "Col:             $Col"
+# $debug && echo "MaxLine:         $MaxLine"
 # $debug && echo "debug:           $debug"
-$debug && echo "grepFlag:        $grepFlag"
-$debug && echo "duFlag:          $duFlag"
-$debug && echo "POSIXLY_CORRECT: $POSIXLY_CORRECT"
+# $debug && echo "grepFlag:        $grepFlag"
+# $debug && echo "duFlag:          $duFlag"
+# $debug && echo "POSIXLY_CORRECT: $POSIXLY_CORRECT"
 
 
 
