@@ -107,6 +107,7 @@ getMaxLine() {
 Usage() {
 	echo "Usage:" 
 	echo "    $0 [-n] [-i REGEX] [FILE]"
+	exit 1
 }
 
 ##############################################
@@ -123,7 +124,6 @@ while getopts ":ni:" opt; do
 	# d ) debug=true
 	# 	;;
     \?) Usage
-		exit;
     	;;
   esac
 done
@@ -137,10 +137,11 @@ if [ "$1" != ""  ]; then
 		rootDir="$1"
 	else 
 		Usage 
-		exit 1
 	fi
 fi
-
+if [ "$2" != ""  ]; then
+	Usage 
+fi
 
 ##############################################
 ## 					Main 					##
