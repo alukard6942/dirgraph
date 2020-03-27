@@ -105,8 +105,8 @@ getMaxLine() {
 }
 
 Usage() {
-	echo "Usage:" 
-	echo "    $0 [-n] [-i REGEX] [FILE]"
+	echo "POUŽITÍ"
+	echo "dirgraph [-i FILE_ERE] [-n] [DIR]"
 	exit 1
 }
 
