@@ -66,7 +66,7 @@ MainLoop() {
 	for file in "$1"/* ; do 
 		if ! $(echo "`basename "${file}"`" | grep "$grepFlag" "$ignoredFiles" ) ; then
 			$debug && echo -en "$file\r"
-			if [ -d "$file" ]; then
+			if ! [ -L "$file" ] && [ -d "$file" ]; then
 				DirCount=`expr $DirCount + 1`
 				MainLoop "$file"
 			elif [ -f "$file" ]; then
@@ -181,12 +181,12 @@ echo "Directories:"			"$DirCount"
 echo "All files:" 			"$FileCount"
 echo "File size histogram:"
 
-echo -n "  <100 B  :"; drawLine "$Arr0" ; echo
-echo -n "  <1 KiB  :"; drawLine "$Arr1" ; echo
-echo -n "  <10 KiB :"; drawLine "$Arr2" ; echo
-echo -n "  <100 KiB:"; drawLine "$Arr3" ; echo
-echo -n "  <1 MiB  :"; drawLine "$Arr4" ; echo
-echo -n "  <10 MiB :"; drawLine "$Arr5" ; echo
-echo -n "  <100 MiB:"; drawLine "$Arr6" ; echo
-echo -n "  <1 GiB  :"; drawLine "$Arr7" ; echo
-echo -n "  >=1 GiB :"; drawLine "$Arr8" ; echo
+echo -n "  <100 B  : "; drawLine "$Arr0" ; echo
+echo -n "  <1 KiB  : "; drawLine "$Arr1" ; echo
+echo -n "  <10 KiB : "; drawLine "$Arr2" ; echo
+echo -n "  <100 KiB: "; drawLine "$Arr3" ; echo
+echo -n "  <1 MiB  : "; drawLine "$Arr4" ; echo
+echo -n "  <10 MiB : "; drawLine "$Arr5" ; echo
+echo -n "  <100 MiB: "; drawLine "$Arr6" ; echo
+echo -n "  <1 GiB  : "; drawLine "$Arr7" ; echo
+echo -n "  >=1 GiB : "; drawLine "$Arr8" ; echo
