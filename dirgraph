@@ -9,6 +9,7 @@ POSIXLY_CORRECT=yes
 DirCount=0
 FileCount=0
 rootDir="$PWD"
+iFlag=false
 ignoredFiles="\$a"
 nFlag=false
 Col=79
@@ -16,7 +17,7 @@ MaxLine=0
 debug=false
 
 grepFlag="-qE"
-duFlag="-b"
+duFlag="-sb"
 
 
 
@@ -64,13 +65,13 @@ updateCount() {
 
 MainLoop() {
 	for file in "$1"/* ; do 
-		if ! $(echo "`basename "${file}"`" | grep "$grepFlag" "$ignoredFiles" ) ; then
+		if ! $iFlag || ! $(echo "`basename "${file}"`" | grep "$grepFlag" "$ignoredFiles" ) ; then
 			$debug && echo -en "$file\r"
 			if ! [ -L "$file" ] && [ -d "$file" ]; then
 				DirCount=`expr $DirCount + 1`
 				MainLoop "$file"
 			elif [ -f "$file" ]; then
-				updateCount `du "$duFlag" "$file" || echo "0"`
+				updateCount `du "$duFlag" "$file" || echo 0`
 				FileCount=`expr $FileCount + 1`
 			fi 
 		fi
@@ -112,12 +113,12 @@ Usage() {
 ## 				Get opt 					##
 ##############################################
 
-
 while getopts ":dni:" opt; do
   case ${opt} in
   	n ) nFlag=true	
 		;;
-	i ) ignoredFiles=$OPTARG
+	i ) iFlag=true
+		ignoredFiles=$OPTARG
 		;;
 	d ) debug=true
 		;;
@@ -126,6 +127,8 @@ while getopts ":dni:" opt; do
     	;;
   esac
 done
+
+$debug && echo "pre $0 $1 $2 $3 $4 $5 $6"
 shift $((OPTIND -1))
 
 
@@ -165,11 +168,14 @@ fi
 ##				Printing					##
 ##############################################
 
+
+$debug && echo "post $0 $1 $2 $3 $4 $5 $6"
 $debug && echo "ignoredFiles:    $ignoredFiles "
 $debug && echo "nFlag:           $nFlag"
+$debug && echo "iFlag:           $iFlag"
 $debug && echo "Col:             $Col"
 $debug && echo "MaxLine:         $MaxLine"
-$debug && echo "debug:           $debug"
+# $debug && echo "debug:           $debug"
 $debug && echo "grepFlag:        $grepFlag"
 $debug && echo "duFlag:          $duFlag"
 $debug && echo "POSIXLY_CORRECT: $POSIXLY_CORRECT"
