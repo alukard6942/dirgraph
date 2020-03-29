@@ -65,7 +65,7 @@ updateCount() {
 
 MainLoop() {
 	for file in "$1"/* ; do 
-		if ! $iFlag || ! $(echo "`basename "${file}"`" | grep "$grepFlag" "$ignoredFiles" ) ; then
+		if ! $iFlag || ! $(echo "`basename "${file}"`" | grep "$grepFlag" -- "$ignoredFiles" ) ; then
 			# $debug && echo -en "$file\r"
 			if ! [ -L "$file" ] && [ -d "$file" ]; then
 				DirCount=`expr $DirCount + 1`
@@ -105,8 +105,8 @@ getMaxLine() {
 }
 
 Usage() {
-	echo "POUŽITÍ"
-	echo "dirgraph [-i FILE_ERE] [-n] [DIR]"
+	echo "usage:" >&2
+	echo -e "\t$0 [-i FILE_ERE] [-n] [DIR]" >&2
 	exit 1
 }
 
@@ -120,6 +120,7 @@ while getopts ":ni:" opt; do
 		;;
 	i ) iFlag=true
 		ignoredFiles=$OPTARG
+		# $(echo "" | grep ""$grepFlag"v" "$ignoredFiles" 1>/dev/null 2>&1 ) || Usage
 		;;
 	# d ) debug=true
 	# 	;;
