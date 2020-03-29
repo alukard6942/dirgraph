@@ -105,6 +105,7 @@ getMaxLine() {
 }
 
 Usage() {
+	echo "$0:" "$1" >&2
 	echo "usage:" >&2
 	echo -e "\t$0 [-i FILE_ERE] [-n] [DIR]" >&2
 	exit 1
@@ -124,7 +125,7 @@ while getopts ":ni:" opt; do
 		;;
 	# d ) debug=true
 	# 	;;
-    \?) Usage
+    \?) Usage "invalid option -- '$OPTARG'"
     	;;
   esac
 done
@@ -137,11 +138,11 @@ if [ "$1" != ""  ]; then
 	if [ -d "$1" ]; then
 		rootDir="$1"
 	else 
-		Usage 
+		Usage "$1: No such file or directory"
 	fi
 fi
 if [ "$2" != ""  ]; then
-	Usage 
+	Usage "invalid argument '$2'"
 fi
 
 ##############################################
